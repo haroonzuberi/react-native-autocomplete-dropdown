@@ -265,11 +265,16 @@ export const AutocompleteDropdown = memo(
 
     const onChangeText = useCallback(
       text => {
-        setSearchText(text)
-        debouncedEvent(text)
+        setSearchText(text);
+        // Clear the selectedItem state when the input text is empty
+        
+          setSelectedItem(null);
+        
+        // Call the debouncedEvent function for handling debouncing, if needed
+        debouncedEvent(text);
       },
       [debouncedEvent]
-    )
+    );
 
     const onChevronPress = useCallback(() => {
       toggle()
@@ -280,30 +285,34 @@ export const AutocompleteDropdown = memo(
       }
     }, [props.onChevronPress, toggle])
 
-    const onFocus = useCallback(
+     const onFocus = useCallback(
       e => {
         if (clearOnFocus) {
-          setSearchText('')
+          setSearchText('');
+          setSelectedItem(null); // Clear selectedItem when input is focused
         }
         if (typeof props.onFocus === 'function') {
-          props.onFocus(e)
+          props.onFocus(e);
         }
-        open()
+        open();
       },
-      [dataSet, clearOnFocus, props.onFocus]
-    )
+      [clearOnFocus, props.onFocus]
+    );
 
     const onBlur = useCallback(
       e => {
+        if (!searchText) {
+          setSelectedItem(null); // Clear selectedItem when input loses focus and is empty
+        }
         if (props.closeOnBlur) {
-          close()
+          close();
         }
         if (typeof props.onBlur === 'function') {
-          props.onBlur(e)
+          props.onBlur(e);
         }
       },
-      [props.closeOnBlur, props.onBlur]
-    )
+      [props.closeOnBlur, props.onBlur, searchText]
+    );
 
     const onSubmit = useCallback(
       e => {
